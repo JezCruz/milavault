@@ -52,7 +52,12 @@
 
 /* Message */
 .message {
-  margin-top: 10px;
-  color: #333;
+  margin-top: 12px;
+  padding: 10px 12px;
   font-size: 14px;
+  font-weight: 600;
+  color: #9c1f5f;
+  background: #ffe4f0;
+  border: 1px solid #f9b6d3;
+  border-radius: 10px;
 }
