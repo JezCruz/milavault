@@ -22,7 +22,7 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <h2>MilaVault</h2>
+        <h2>Mila<span className="brand-accent">Vault</span></h2>
         <form onSubmit={handleLogin}>
           <input
             type="email"

@@ -8,6 +8,8 @@ body, html {
   min-height: 100vh;
 }
 
+.brand-accent { color: #f472b6; }
+
 .dashboard.light { background: #f3f4f6; color: #111; }
 .dashboard.dark { background: #0f1115; color: #e9ecf1; }
 

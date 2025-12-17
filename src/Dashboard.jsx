@@ -243,7 +243,7 @@ export default function Dashboard({ theme, toggleTheme }) {
     <div className={`dashboard ${theme}`}>
       {/* Header & Theme Toggle */}
       <header className="dashboard-header">
-        <h1>MilaVault</h1>
+        <h1>Mila<span className="brand-accent">Vault</span></h1>
         <div className="header-buttons">
           <button className="theme-toggle" onClick={toggleTheme}>
             {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
