@@ -33,6 +33,7 @@ export default function Login() {
           />
           <button type="submit">🤝 MilaVault Login link – Click here</button>
           <p className="hint">Magic link is usable for about 5 minutes before it expires.</p>
+          {email && <p className="current-email">You’re signing in as <strong>{email}</strong></p>}
         </form>
         {message && <p className="message">{message}</p>}
       </div>
