@@ -261,7 +261,7 @@ export default function Dashboard({ theme, toggleTheme }) {
           <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} />
           <input name="contact" placeholder="Contact" value={formData.contact} onChange={handleChange} />
           <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
-          <input name="address" placeholder="Address" value={formData.address} onChange={handleChange} />
+          <input name="address" placeholder="Home Address" value={formData.address} onChange={handleChange} />
           <input name="social_facebook" placeholder="Facebook" value={formData.social_facebook} onChange={handleChange} />
           <input name="social_instagram" placeholder="Instagram" value={formData.social_instagram} onChange={handleChange} />
         </div>

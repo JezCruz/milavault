@@ -25,3 +25,4 @@ dist-ssr
 
 #ignores env files
 .env
+DevDocs.local.md
