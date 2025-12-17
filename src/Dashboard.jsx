@@ -2,6 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react'
 import { supabase } from './supabaseClient'
 
 const DRAFT_STORAGE_KEY = 'milavault_notes_drafts'
+const EDIT_DRAFT_STORAGE_KEY = 'milavault_edit_drafts'
 
 export default function Dashboard({ theme, toggleTheme }) {
   const [people, setPeople] = useState([])
@@ -38,7 +39,15 @@ export default function Dashboard({ theme, toggleTheme }) {
       return {}
     }
   })
-  const handleEditChange = (e) => setEditingData({ ...editingData, [e.target.name]: e.target.value })
+  const [editDrafts, setEditDrafts] = useState(() => {
+    try {
+      const saved = localStorage.getItem(EDIT_DRAFT_STORAGE_KEY)
+      return saved ? JSON.parse(saved) : {}
+    } catch (err) {
+      console.error('Failed to load edit drafts', err)
+      return {}
+    }
+  })
 
   const persistDrafts = (next) => {
     setNotesDrafts(next)
@@ -47,6 +56,18 @@ export default function Dashboard({ theme, toggleTheme }) {
     } catch (err) {
       console.error('Failed to persist note drafts', err)
     }
+  }
+
+  const persistEditDrafts = (updater) => {
+    setEditDrafts((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      try {
+        localStorage.setItem(EDIT_DRAFT_STORAGE_KEY, JSON.stringify(next))
+      } catch (err) {
+        console.error('Failed to persist edit drafts', err)
+      }
+      return next
+    })
   }
 
   // Fetch people for the logged-in user
@@ -83,6 +104,17 @@ export default function Dashboard({ theme, toggleTheme }) {
   }, [])
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value })
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target
+    setEditingData((prev) => {
+      const next = { ...prev, [name]: value }
+      if (editingId) {
+        persistEditDrafts((drafts) => ({ ...drafts, [editingId]: next }))
+      }
+      return next
+    })
+  }
 
   const addPerson = async () => {
     if (!formData.name.trim()) {
@@ -123,17 +155,77 @@ export default function Dashboard({ theme, toggleTheme }) {
     }
   }
 
-  const startEditing = (person) => {
-    setEditingId(person.id)
-    setEditingData({
+  const getEditDraft = (person) =>
+    editDrafts[person.id] || {
       name: person.name || '',
       contact: person.contact || '',
       email: person.email || '',
       address: person.address || '',
       social_facebook: person.social_facebook || '',
       social_instagram: person.social_instagram || '',
-      notes: getNoteDraft(person),
+      notes: person.notes || '',
+    }
+
+  const autoSaveCurrentEdit = async () => {
+    if (!editingId || !currentUser) return true
+    const payload = editDrafts[editingId] || editingData
+    if (!payload.name.trim()) {
+      setStatus('Name is required before autosaving. Draft kept locally.')
+      return false
+    }
+    setStatus('Autosaving...')
+    const { error } = await supabase
+      .from('people')
+      .update({ ...payload })
+      .eq('id', editingId)
+      .eq('user_id', currentUser.id)
+
+    if (error) {
+      console.error(error)
+      setStatus(error.message || 'Could not autosave. Please retry.')
+      return false
+    }
+
+    const { data, error: refreshError } = await supabase
+      .from('people')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('name')
+
+    if (refreshError) {
+      console.error(refreshError)
+      setStatus('Autosaved, but list did not refresh. Reload the page.')
+    } else {
+      setPeople(data || [])
+      setStatus('Changes autosaved.')
+    }
+
+    persistEditDrafts((drafts) => {
+      const next = { ...drafts }
+      delete next[editingId]
+      return next
     })
+
+    setEditingId(null)
+    setEditingData({
+      name: '',
+      contact: '',
+      email: '',
+      address: '',
+      social_facebook: '',
+      social_instagram: '',
+      notes: '',
+    })
+    return true
+  }
+
+  const startEditing = async (person) => {
+    if (editingId && editingId !== person.id) {
+      const ok = await autoSaveCurrentEdit()
+      if (!ok) return
+    }
+    setEditingId(person.id)
+    setEditingData({ ...getEditDraft(person), notes: getNoteDraft(person) })
     setStatus('Editing person...')
   }
 
@@ -148,6 +240,13 @@ export default function Dashboard({ theme, toggleTheme }) {
       social_instagram: '',
       notes: '',
     })
+    if (editingId) {
+      persistEditDrafts((drafts) => {
+        const next = { ...drafts }
+        delete next[editingId]
+        return next
+      })
+    }
     setStatus('')
   }
 
@@ -193,6 +292,12 @@ export default function Dashboard({ theme, toggleTheme }) {
       delete nextDrafts[editingId]
       persistDrafts(nextDrafts)
     }
+
+    persistEditDrafts((drafts) => {
+      const next = { ...drafts }
+      delete next[editingId]
+      return next
+    })
 
     cancelEditing()
   }

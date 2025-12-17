@@ -9,6 +9,7 @@ It supports login via magic links, adding/viewing people, dark/light theme, and 
 - Lock Vault for security
 - Dark/Light mode toggle
 - Mobile & Desktop responsive
+- Autosaves edits: in-progress changes are stored locally and auto-saved when switching people
 
 ## Getting Started
 1. Clone the repo:
