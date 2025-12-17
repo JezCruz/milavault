@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { supabase } from './supabaseClient'
+
+const DRAFT_STORAGE_KEY = 'milavault_notes_drafts'
 
 export default function Dashboard({ theme, toggleTheme }) {
   const [people, setPeople] = useState([])
-  const handleEditChange = (e) => setEditingData({ ...editingData, [e.target.name]: e.target.value })
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -11,6 +12,7 @@ export default function Dashboard({ theme, toggleTheme }) {
     address: '',
     social_facebook: '',
     social_instagram: '',
+    notes: '',
   })
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('')
@@ -24,7 +26,30 @@ export default function Dashboard({ theme, toggleTheme }) {
     address: '',
     social_facebook: '',
     social_instagram: '',
+    notes: '',
   })
+  const [expandedNotesId, setExpandedNotesId] = useState(null)
+  const [notesDrafts, setNotesDrafts] = useState({})
+  const handleEditChange = (e) => setEditingData({ ...editingData, [e.target.name]: e.target.value })
+
+  // Load persisted note drafts
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_STORAGE_KEY)
+      if (saved) setNotesDrafts(JSON.parse(saved))
+    } catch (err) {
+      console.error('Failed to load note drafts', err)
+    }
+  }, [])
+
+  const persistDrafts = (next) => {
+    setNotesDrafts(next)
+    try {
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(next))
+    } catch (err) {
+      console.error('Failed to persist note drafts', err)
+    }
+  }
 
   // Fetch people for the logged-in user
   const fetchPeople = async (userId) => {
@@ -84,6 +109,7 @@ export default function Dashboard({ theme, toggleTheme }) {
       address: '',
       social_facebook: '',
       social_instagram: '',
+      notes: '',
     })
     const { data, error: refreshError } = await supabase
       .from('people')
@@ -108,6 +134,7 @@ export default function Dashboard({ theme, toggleTheme }) {
       address: person.address || '',
       social_facebook: person.social_facebook || '',
       social_instagram: person.social_instagram || '',
+      notes: getNoteDraft(person),
     })
     setStatus('Editing person...')
   }
@@ -121,6 +148,7 @@ export default function Dashboard({ theme, toggleTheme }) {
       address: '',
       social_facebook: '',
       social_instagram: '',
+      notes: '',
     })
     setStatus('')
   }
@@ -162,6 +190,12 @@ export default function Dashboard({ theme, toggleTheme }) {
       setStatus('Person updated!')
     }
 
+    if (notesDrafts[editingId]) {
+      const nextDrafts = { ...notesDrafts }
+      delete nextDrafts[editingId]
+      persistDrafts(nextDrafts)
+    }
+
     cancelEditing()
   }
 
@@ -186,6 +220,11 @@ export default function Dashboard({ theme, toggleTheme }) {
     }
 
     if (editingId === id) cancelEditing()
+    if (notesDrafts[id]) {
+      const nextDrafts = { ...notesDrafts }
+      delete nextDrafts[id]
+      persistDrafts(nextDrafts)
+    }
 
     const { data, error: refreshError } = await supabase
       .from('people')
@@ -202,6 +241,57 @@ export default function Dashboard({ theme, toggleTheme }) {
     }
   }
 
+  const toggleNotes = (person) => {
+    const isOpen = expandedNotesId === person.id
+    if (!isOpen && notesDrafts[person.id] === undefined) {
+      persistDrafts({ ...notesDrafts, [person.id]: person.notes ?? '' })
+    }
+    setExpandedNotesId(isOpen ? null : person.id)
+  }
+
+  const handleNoteDraftChange = (personId, value) => {
+    persistDrafts({ ...notesDrafts, [personId]: value })
+  }
+
+  const saveNote = async (person) => {
+    if (!currentUser) {
+      setStatus('Not authenticated. Please log in again.')
+      return
+    }
+    const noteValue = getNoteDraft(person)
+    setStatus('Saving note...')
+    const { error } = await supabase
+      .from('people')
+      .update({ notes: noteValue })
+      .eq('id', person.id)
+      .eq('user_id', currentUser.id)
+
+    if (error) {
+      console.error(error)
+      setStatus(error.message || 'Could not save note. Please try again.')
+      return
+    }
+
+    const { data, error: refreshError } = await supabase
+      .from('people')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('name')
+
+    if (refreshError) {
+      console.error(refreshError)
+      setStatus('Saved, but list did not refresh. Reload the page.')
+    } else {
+      setPeople(data || [])
+      setStatus('Note saved!')
+    }
+
+    const nextDrafts = { ...notesDrafts }
+    delete nextDrafts[person.id]
+    persistDrafts(nextDrafts)
+    setExpandedNotesId(null)
+  }
+
   // Derived filtered list for search
   const filteredPeople = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -214,6 +304,7 @@ export default function Dashboard({ theme, toggleTheme }) {
         p.address,
         p.social_facebook,
         p.social_instagram,
+        p.notes,
       ]
         .filter(Boolean)
         .join(' ')
@@ -231,6 +322,8 @@ export default function Dashboard({ theme, toggleTheme }) {
       regex.test(part) ? <mark key={idx}>{part}</mark> : part
     )
   }
+
+  const getNoteDraft = (person) => notesDrafts[person.id] ?? person.notes ?? ''
 
   // Lock Vault: sign out and redirect to login
   const handleLockVault = async () => {
@@ -264,6 +357,13 @@ export default function Dashboard({ theme, toggleTheme }) {
           <input name="address" placeholder="Home Address" value={formData.address} onChange={handleChange} />
           <input name="social_facebook" placeholder="Facebook" value={formData.social_facebook} onChange={handleChange} />
           <input name="social_instagram" placeholder="Instagram" value={formData.social_instagram} onChange={handleChange} />
+          <textarea
+            name="notes"
+            placeholder="Notes (optional)"
+            value={formData.notes}
+            onChange={handleChange}
+            rows={3}
+          />
         </div>
         <button className="add-btn" onClick={addPerson}>Add Person</button>
         {status && <p className="status-text">{status}</p>}
@@ -295,17 +395,19 @@ export default function Dashboard({ theme, toggleTheme }) {
                 <th>Home Address</th>
                 <th>Facebook</th>
                 <th>Instagram</th>
+                <th>Notes</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="7" className="muted">Loading...</td></tr>
+                <tr><td colSpan="8" className="muted">Loading...</td></tr>
               ) : filteredPeople.length === 0 ? (
-                <tr><td colSpan="7" className="muted">No people found.</td></tr>
+                <tr><td colSpan="8" className="muted">No people found.</td></tr>
               ) : (
                 filteredPeople.map((p) => (
-                  <tr key={p.id}>
+                  <Fragment key={p.id}>
+                  <tr>
                     <td>
                       {editingId === p.id ? (
                         <input name="name" value={editingData.name} onChange={handleEditChange} />
@@ -337,6 +439,14 @@ export default function Dashboard({ theme, toggleTheme }) {
                       ) : highlight(p.social_instagram)}
                     </td>
                     <td>
+                      <div className="notes-snippet">
+                        <div className="note-text">{highlight((getNoteDraft(p) || '').slice(0, 60))}{(getNoteDraft(p) || '').length > 60 ? '…' : ''}</div>
+                        <button className="action-btn note" onClick={() => toggleNotes(p)}>
+                          {expandedNotesId === p.id ? 'Hide notes' : 'View full notes'}
+                        </button>
+                      </div>
+                    </td>
+                    <td>
                       {editingId === p.id ? (
                         <div className="action-buttons">
                           <button className="action-btn save" onClick={saveEdit}>Save</button>
@@ -351,6 +461,24 @@ export default function Dashboard({ theme, toggleTheme }) {
                       )}
                     </td>
                   </tr>
+                  {expandedNotesId === p.id && (
+                    <tr className="notes-row">
+                      <td colSpan="8">
+                        <div className="notes-panel">
+                          <textarea
+                            value={getNoteDraft(p)}
+                            onChange={(e) => handleNoteDraftChange(p.id, e.target.value)}
+                            rows={6}
+                          />
+                          <div className="action-buttons">
+                            <button className="action-btn save" onClick={() => saveNote(p)}>Save note</button>
+                            <button className="action-btn cancel" onClick={() => setExpandedNotesId(null)}>Close</button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 ))
               )}
             </tbody>

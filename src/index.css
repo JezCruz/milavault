@@ -88,6 +88,22 @@ body, html {
   box-shadow: 0 0 0 3px rgba(124,58,237,0.2);
 }
 
+.form-grid textarea {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #d7dde5;
+  background: #f9fafb;
+  resize: vertical;
+  min-height: 96px;
+  grid-column: 1 / -1;
+}
+
+.dashboard.dark .form-grid textarea {
+  background: #1f2530;
+  border: 1px solid #2f3745;
+  color: #e9ecf1;
+}
+
 .add-btn {
   width: 100%;
   padding: 14px;
@@ -240,9 +256,48 @@ mark {
 .action-btn.save { background: linear-gradient(135deg, #22c55e, #16a34a); }
 .action-btn.cancel { background: linear-gradient(135deg, #9ca3af, #6b7280); }
 .action-btn.delete { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+.action-btn.note { background: linear-gradient(135deg, #f472b6, #ec4899); color: #fff; }
 
 .action-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,0.12); }
 .dashboard.dark .action-btn:hover { box-shadow: 0 8px 18px rgba(0,0,0,0.35); }
+
+.notes-snippet {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.note-text {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: inherit;
+}
+
+.notes-row td { background: rgba(124,58,237,0.04); }
+.dashboard.dark .notes-row td { background: rgba(124,58,237,0.12); }
+
+.notes-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notes-panel textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #d7dde5;
+  background: #f9fafb;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.dashboard.dark .notes-panel textarea {
+  background: #1f2530;
+  border: 1px solid #2f3745;
+  color: #e9ecf1;
+}
 
 /* Mobile Responsive */
 @media (max-width: 900px) {
