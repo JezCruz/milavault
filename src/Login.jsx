@@ -31,7 +31,8 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <button type="submit">Send Magic Link</button>
+          <button type="submit">🤝 MilaVault Login link – Click here</button>
+          <p className="hint">Magic link is usable for about 5 minutes before it expires.</p>
         </form>
         {message && <p className="message">{message}</p>}
       </div>
