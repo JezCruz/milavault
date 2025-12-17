@@ -19,10 +19,16 @@
 }
 
 /* Inputs */
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
 .login-card input {
   width: 100%;
   padding: 12px 15px;
-  margin: 10px 0;
   border-radius: 12px;
   border: 1px solid #ddd;
   font-size: 16px;
