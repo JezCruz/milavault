@@ -1,53 +1,69 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 
-export default function Dashboard() {
+export default function Dashboard({ theme, toggleTheme }) {
   const [people, setPeople] = useState([])
-  const [name, setName] = useState('')
-
-  // Fetch people from Supabase
-  const fetchPeople = async () => {
-    const { data, error } = await supabase
-      .from('people')
-      .select('*')
-      .order('name')
-    if (error) console.error(error)
-    else setPeople(data)
-  }
-
-  // Add new person
-  const addPerson = async () => {
-    if (!name) return
-    const { error } = await supabase.from('people').insert([{ name }])
-    if (error) console.error(error)
-    else {
-      setName('')
-      fetchPeople()
-    }
-  }
+  const [formData, setFormData] = useState({
+    name: '', contact: '', email: '', address: '', social_facebook: '', social_instagram: ''
+  })
 
   useEffect(() => {
+    const fetchPeople = async () => {
+      const { data, error } = await supabase.from('people').select('*').order('name')
+      if (error) console.error(error)
+      else setPeople(data)
+    }
     fetchPeople()
   }, [])
 
+  const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value })
+
+  const addPerson = async () => {
+    const { error } = await supabase.from('people').insert([formData])
+    if (!error) {
+      setFormData({ name: '', contact: '', email: '', address: '', social_facebook: '', social_instagram: '' })
+      const { data } = await supabase.from('people').select('*').order('name')
+      setPeople(data)
+    }
+  }
+
   return (
-    <div style={{ padding: 20 }}>
-      <h2>People List</h2>
-      <input
-        type="text"
-        placeholder="Add Name"
-        value={name}
-        onChange={e => setName(e.target.value)}
-        style={{ padding: 8, width: 250 }}
-      />
-      <button onClick={addPerson} style={{ padding: '8px 20px', marginLeft: 10 }}>
-        Add
-      </button>
-      <ul>
+    <div className={`dashboard ${theme}`}>
+      {/* Header & Theme Toggle */}
+      <header className="dashboard-header">
+        <h1>MilaVault</h1>
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+        </button>
+      </header>
+
+      {/* Add Person Form */}
+      <section className="form-section">
+        <h2>Add a Person</h2>
+        <div className="form-grid">
+          <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} />
+          <input name="contact" placeholder="Contact" value={formData.contact} onChange={handleChange} />
+          <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
+          <input name="address" placeholder="Address" value={formData.address} onChange={handleChange} />
+          <input name="social_facebook" placeholder="Facebook" value={formData.social_facebook} onChange={handleChange} />
+          <input name="social_instagram" placeholder="Instagram" value={formData.social_instagram} onChange={handleChange} />
+        </div>
+        <button className="add-btn" onClick={addPerson}>Add Person</button>
+      </section>
+
+      {/* People List */}
+      <section className="people-list">
         {people.map(p => (
-          <li key={p.id}>{p.name}</li>
+          <div className="person-card" key={p.id}>
+            <h3>{p.name}</h3>
+            <p>📞 {p.contact}</p>
+            <p>✉️ {p.email}</p>
+            <p>🏠 {p.address}</p>
+            <p>🔗 FB: {p.social_facebook}</p>
+            <p>🔗 IG: {p.social_instagram}</p>
+          </div>
         ))}
-      </ul>
+      </section>
     </div>
   )
 }

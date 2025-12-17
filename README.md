@@ -25,6 +25,10 @@ Private web app for Tita Mila to store and manage her people’s information sec
 - Secure login using Supabase magic link
 - Dashboard to view and add people
 - Private and self-hosted data storage
+- Light / Dark mode toggle with cute button
+- Smooth transition animations
+- Mobile-friendly layout and cards
+
 
 ## Tech Stack
 

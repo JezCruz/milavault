@@ -7,27 +7,21 @@ export default function Login() {
 
   const handleLogin = async () => {
     const { error } = await supabase.auth.signInWithOtp({ email })
-    if (error) {
-      setMessage(error.message)
-    } else {
-      setMessage('Check your email for the login link!')
-    }
+    if (error) setMessage(error.message)
+    else setMessage('Check your email for the login link!')
   }
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20, maxWidth: 400, margin: '0 auto' }}>
       <h2>Login to MilaVault</h2>
       <input
         type="email"
         placeholder="Your email"
         value={email}
         onChange={e => setEmail(e.target.value)}
-        style={{ padding: 8, width: '300px', marginBottom: 10 }}
+        style={{ padding: 10, width: '100%', marginBottom: 10 }}
       />
-      <br />
-      <button onClick={handleLogin} style={{ padding: '8px 20px' }}>
-        Send Magic Link
-      </button>
+      <button onClick={handleLogin} style={{ padding: 10, width: '100%' }}>Send Magic Link</button>
       <p>{message}</p>
     </div>
   )
