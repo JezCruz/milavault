@@ -29,18 +29,16 @@ export default function Dashboard({ theme, toggleTheme }) {
     notes: '',
   })
   const [expandedNotesId, setExpandedNotesId] = useState(null)
-  const [notesDrafts, setNotesDrafts] = useState({})
-  const handleEditChange = (e) => setEditingData({ ...editingData, [e.target.name]: e.target.value })
-
-  // Load persisted note drafts
-  useEffect(() => {
+  const [notesDrafts, setNotesDrafts] = useState(() => {
     try {
       const saved = localStorage.getItem(DRAFT_STORAGE_KEY)
-      if (saved) setNotesDrafts(JSON.parse(saved))
+      return saved ? JSON.parse(saved) : {}
     } catch (err) {
       console.error('Failed to load note drafts', err)
+      return {}
     }
-  }, [])
+  })
+  const handleEditChange = (e) => setEditingData({ ...editingData, [e.target.name]: e.target.value })
 
   const persistDrafts = (next) => {
     setNotesDrafts(next)
