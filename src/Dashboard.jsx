@@ -438,7 +438,7 @@ export default function Dashboard({ theme, toggleTheme }) {
                     </td>
                     <td>
                       <div className="notes-snippet">
-                        <div className="note-text">{highlight((getNoteDraft(p) || '').slice(0, 60))}{(getNoteDraft(p) || '').length > 60 ? '…' : ''}</div>
+                        <div className="note-text">{highlight((getNoteDraft(p) || '').slice(0, 10))}{(getNoteDraft(p) || '').length > 10 ? '…' : ''}</div>
                         <button className="action-btn note" onClick={() => toggleNotes(p)}>
                           {expandedNotesId === p.id ? 'Hide notes' : 'View full notes'}
                         </button>
