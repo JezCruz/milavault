@@ -1,18 +1,26 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
+import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard({ theme, toggleTheme }) {
   const [people, setPeople] = useState([])
   const [formData, setFormData] = useState({
     name: '', contact: '', email: '', address: '', social_facebook: '', social_instagram: ''
   })
+  const navigate = useNavigate()
 
+  // Fetch people for the logged-in user
   useEffect(() => {
     const fetchPeople = async () => {
-      const { data, error } = await supabase.from('people').select('*').order('name')
+      const { data, error } = await supabase
+        .from('people')
+        .select('*')
+        .order('name')
+
       if (error) console.error(error)
       else setPeople(data)
     }
+
     fetchPeople()
   }, [])
 
@@ -21,10 +29,18 @@ export default function Dashboard({ theme, toggleTheme }) {
   const addPerson = async () => {
     const { error } = await supabase.from('people').insert([formData])
     if (!error) {
-      setFormData({ name: '', contact: '', email: '', address: '', social_facebook: '', social_instagram: '' })
+      setFormData({
+        name: '', contact: '', email: '', address: '', social_facebook: '', social_instagram: ''
+      })
       const { data } = await supabase.from('people').select('*').order('name')
       setPeople(data)
     }
+  }
+
+  // Lock Vault: sign out and redirect to login
+  const handleLockVault = async () => {
+    await supabase.auth.signOut()
+    navigate('/login')
   }
 
   return (
@@ -32,9 +48,14 @@ export default function Dashboard({ theme, toggleTheme }) {
       {/* Header & Theme Toggle */}
       <header className="dashboard-header">
         <h1>MilaVault</h1>
-        <button className="theme-toggle" onClick={toggleTheme}>
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
+        <div className="header-buttons">
+          <button className="theme-toggle" onClick={toggleTheme}>
+            {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+          </button>
+          <button className="lock-btn" onClick={handleLockVault}>
+            🔒 Lock Vault
+          </button>
+        </div>
       </header>
 
       {/* Add Person Form */}

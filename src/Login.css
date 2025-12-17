@@ -1,0 +1,58 @@
+/* Login Page Layout */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffd1dc, #a0e7e5);
+  font-family: "Poppins", sans-serif;
+}
+
+/* Card Style */
+.login-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  width: 350px;
+  text-align: center;
+}
+
+/* Inputs */
+.login-card input {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  transition: 0.3s;
+}
+.login-card input:focus {
+  border-color: #ff5f7e;
+  outline: none;
+  box-shadow: 0 0 8px rgba(255,95,126,0.3);
+}
+
+/* Button */
+.login-card button {
+  width: 100%;
+  padding: 12px;
+  background: #ff5f7e;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+.login-card button:hover {
+  background: #ff3b5c;
+}
+
+/* Message */
+.message {
+  margin-top: 10px;
+  color: #333;
+  font-size: 14px;
+}

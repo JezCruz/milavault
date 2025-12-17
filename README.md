@@ -1,46 +1,37 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-
-
 # MilaVault
 
-Private web app for Tita Mila to store and manage her people’s information securely.
+MilaVault is a private people information manager built with React, Vite, and Supabase.  
+It supports login via magic links, adding/viewing people, dark/light theme, and secure vault locking.
 
 ## Features
+- Magic Link Login (via Supabase)
+- Add, view, and manage people info
+- Lock Vault for security
+- Dark/Light mode toggle
+- Mobile & Desktop responsive
 
-- Secure login using Supabase magic link
-- Dashboard to view and add people
-- Private and self-hosted data storage
-- Light / Dark mode toggle with cute button
-- Smooth transition animations
-- Mobile-friendly layout and cards
+## Getting Started
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/JezCruz/milavault.git
+   cd milavault
+Install dependencies:
 
-
-## Tech Stack
-
-- React + Vite
-- Supabase (PostgreSQL, Auth)
-- JavaScript
-
-## How to Run Locally
-
-```bash
-# Install dependencies
+bash
+Copy code
 npm install
+Create a .env file and add your Supabase keys:
 
-# Run dev server
+ini
+Copy code
+VITE_SUPABASE_URL=https://YOUR_SUPABASE_URL.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_ANON_KEY
+Run the development server:
+
+bash
+Copy code
 npm run dev
+Deployment
+Vercel: https://milavault.vercel.app
+
+Screenshots

@@ -1,28 +1,34 @@
-import { supabase } from './supabaseClient'
-import { useState } from 'react'
+import { useState } from "react";
+import { supabase } from "./supabaseClient";
+import "./Login.css";
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [message, setMessage] = useState('')
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOtp({ email })
-    if (error) setMessage(error.message)
-    else setMessage('Check your email for the login link!')
-  }
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const { error } = await supabase.auth.signInWithOtp({ email });
+    if (error) setMessage(error.message);
+    else setMessage("Magic link sent! Check your email.");
+  };
 
   return (
-    <div style={{ padding: 20, maxWidth: 400, margin: '0 auto' }}>
-      <h2>Login to MilaVault</h2>
-      <input
-        type="email"
-        placeholder="Your email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        style={{ padding: 10, width: '100%', marginBottom: 10 }}
-      />
-      <button onClick={handleLogin} style={{ padding: 10, width: '100%' }}>Send Magic Link</button>
-      <p>{message}</p>
+    <div className="login-page">
+      <div className="login-card">
+        <h2>MilaVault</h2>
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <button type="submit">Send Magic Link</button>
+        </form>
+        {message && <p className="message">{message}</p>}
+      </div>
     </div>
-  )
+  );
 }
