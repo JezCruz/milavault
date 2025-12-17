@@ -8,7 +8,13 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signInWithOtp({ email });
+    // Use a redirect URL from environment when available (for Vercel production).
+    // Falls back to current origin for local testing.
+    const redirectTo = import.meta.env.VITE_APP_URL || window.location.origin;
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: redirectTo },
+    });
     if (error) setMessage(error.message);
     else setMessage("Magic link sent! Check your email.");
   };
