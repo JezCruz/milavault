@@ -426,6 +426,11 @@ export default function Dashboard({ theme, toggleTheme }) {
     )
   }
 
+  const truncate = (value, limit = 12) => {
+    const str = String(value || '')
+    return str.length <= limit ? str : `${str.slice(0, limit)}…`
+  }
+
   const getNoteDraft = (person) => notesDrafts[person.id] ?? person.notes ?? ''
 
   // Lock Vault: sign out and redirect to login
@@ -519,17 +524,17 @@ export default function Dashboard({ theme, toggleTheme }) {
                     <td>
                       {editingId === p.id ? (
                         <input name="contact" value={editingData.contact} onChange={handleEditChange} />
-                      ) : highlight(p.contact)}
+                      ) : highlight(truncate(p.contact))}
                     </td>
                     <td>
                       {editingId === p.id ? (
                         <input name="email" value={editingData.email} onChange={handleEditChange} />
-                      ) : highlight(p.email)}
+                      ) : highlight(truncate(p.email))}
                     </td>
                     <td>
                       {editingId === p.id ? (
                         <input name="address" value={editingData.address} onChange={handleEditChange} />
-                      ) : highlight(p.address)}
+                      ) : highlight(truncate(p.address))}
                     </td>
                     <td>
                       {editingId === p.id ? (
