@@ -57,3 +57,6 @@ Notes:
 - The app reads `VITE_APP_URL` to include a redirect URL when sending Magic Links. Locally it falls back to `http://localhost:5173`.
 - If you want to test on a mobile device without deploying, use a tunnel (ngrok) and add that URL to Supabase Redirect URLs.
 - The app now wraps `App` with `BrowserRouter` so `useNavigate` works; if you see a white screen after login, make sure the router provider is present.
+
+## 📜 License
+This project is licensed under the MIT License.
