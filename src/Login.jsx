@@ -22,7 +22,10 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <h2>Mila<span className="brand-accent">Vault</span></h2>
+        <h2>
+          Mila<span className="brand-accent">Vault</span>
+        </h2>
+
         <form onSubmit={handleLogin}>
           <input
             type="email"
@@ -31,12 +34,15 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+
+          <div
+            className="h-captcha"
+            data-sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY}
+          ></div>
+
           <button type="submit">Send Magic Link</button>
         </form>
-        <form method="POST">
-          <div class="h-captcha" data-sitekey="1bd0e2a6-96fa-46a4-bc7c-36b4f56ce888"></div>
-          <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-        </form>
+
         {message && <p className="message">{message}</p>}
       </div>
     </div>
