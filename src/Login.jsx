@@ -8,15 +8,30 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // Use a redirect URL from environment when available (for Vercel production).
-    // Falls back to current origin for local testing.
+
     const redirectTo = import.meta.env.VITE_APP_URL || window.location.origin;
+
+    const token = window.hcaptcha?.getResponse();
+
+    if (!token) {
+      setMessage("Please complete the captcha first.");
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: redirectTo },
+      options: {
+        emailRedirectTo: redirectTo,
+        captchaToken: token,
+      },
     });
-    if (error) setMessage(error.message);
-    else setMessage("Magic link sent! Check your email.");
+
+    if (error) {
+      setMessage(error.message);
+    } else {
+      setMessage("Magic link sent! Check your email.");
+      window.hcaptcha?.reset();
+    }
   };
 
   return (
