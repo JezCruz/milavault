@@ -31,9 +31,11 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          <button type="submit">Send Magic Link</button>
+        </form>
+        <form method="POST">
           <div class="h-captcha" data-sitekey="1bd0e2a6-96fa-46a4-bc7c-36b4f56ce888"></div>
           <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-          <button type="submit">Send Magic Link</button>
         </form>
         {message && <p className="message">{message}</p>}
       </div>
